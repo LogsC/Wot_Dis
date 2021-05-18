@@ -1,0 +1,14 @@
+{
+  "name": "Wot Dis Bot",
+  "version": "0.0.1",
+  "description": "Test bot for learning JS",
+  "main": "index.js",
+  "author": "loglogs",
+  "dependences": {
+    "discord.js": "^12.5.3"
+  },
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "mongodb": "^3.6.6"
+  }
+}
