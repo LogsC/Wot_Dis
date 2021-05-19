@@ -24,6 +24,8 @@ var prefix = "~";
 client.on("message", msg => {
   var curr_msg = msg.content;
   // print msg info
+  console.log("message: " + msg.content); // message string
+  console.log("words: " + msg.content.split(" ")); // array of words split by space " "
   console.log("author: " + msg.author); // msg.author and msg.author.id return same number string (id)
   console.log("msg ID: " + msg.id); // msg id
   console.log("Timestamp: " + msg.createdTimestamp); // time (milliseconds) since 1/1/1970 00:00 UTC
