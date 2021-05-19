@@ -19,6 +19,6 @@ Discord Messages Data Analysis:
 
     Data Extraction:
      - upon loading bot:
-         - check last input message date from MDB
+         - check last input message date from MDB (largest timestamp)
          - input all messages from said date until current
          - monitor for new messages, input as necessary

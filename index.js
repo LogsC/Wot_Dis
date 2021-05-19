@@ -24,9 +24,12 @@ var prefix = "~";
 client.on("message", msg => {
   var curr_msg = msg.content;
   // print msg info
-  console.log(msg.user);
-  console.log(msg.channel);
-  console.log(msg.guild);
+  console.log("author: " + msg.author); // msg.author and msg.author.id return same number string (id)
+  console.log("msg ID: " + msg.id); // msg id
+  console.log("Timestamp: " + msg.createdTimestamp); // time (milliseconds) since 1/1/1970 00:00 UTC
+  console.log("Time: " + msg.createdAt); // time in legible form
+  console.log("Channel: " + msg.channel.id); // channel id
+  console.log("Guild: " + msg.guild.id); // guild (server) id
   // if first char of message = "~"
   if (curr_msg.substring(0, 1) == prefix) {
     // split message String into array separated by spaces " "
