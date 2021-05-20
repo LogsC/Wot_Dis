@@ -12,6 +12,26 @@ const client = new Discord.Client();
 // log into discord bot account
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  console.log("Guilds / Servers: \n");
+  var servers = client.guilds.cache.array();
+  for (const server of servers) {
+    console.log(server.name + " " + server.id + "\n");
+  }
+  console.log("Users: \n" + client.users.cache.array());
+  console.log("Messages: \n");
+  // obtain list of all channels that the bot (client) has access to
+  var channels = client.guilds.channels.cache.array();
+  // confirm first channel is a text channel
+  if (channels[0].isText()) {
+    var messages = channels[0].messages.cache.array();
+  }
+  // pull the 100 most recent messages from first channel in list
+  channels[0].messages.fetch({ limit: 100 }).then(messages => {
+    console.log(`Received ${messages.size} messages`);
+    //Iterate through the messages here with the variable "messages".
+    messages.forEach(message => console.log(message.content))
+  })
+  // https://stackoverflow.com/questions/55153125/fetch-more-than-100-messages to continue finding messages
 })
 
 // set prefix
