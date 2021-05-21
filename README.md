@@ -12,7 +12,7 @@ Discord Messages Data Analysis:
     Data Components:
      - one data entry contains:
          - word
-         - date
+         - date (timestamp)
          - message ID
          - user ID
          - guild (server) ID

@@ -27,6 +27,19 @@ client.on("ready", () => {
   if (channels[0].isText()) {
     var messages = channels[0].messages.cache.array();
   }
+  // TODO: connect to MDB client and load data
+  // extract data from discord
+  // MongoDB client connection reference (replace <password> with LogLogs password):
+  /*
+  const MongoClient = require('mongodb').MongoClient;
+  const uri = "mongodb+srv://LogLogs:<password>@msgcluster.8dtqt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  client.connect(err => {
+    const collection = client.db("test").collection("devices");
+    // perform actions on the collection object
+    client.close();
+  });
+  */
   // pull the 100 most recent messages from first channel in list
   console.log("Channels: " + channels.length);
   channels[0].messages.fetch({ limit: 100 }).then(messages => {
@@ -40,8 +53,7 @@ client.on("ready", () => {
 // set prefix
 var prefix = "~";
 
-// TODO: connect to MDB client and load data
-// extract data from discord
+
 
 // wait for message
 client.on("message", msg => {
@@ -50,7 +62,7 @@ client.on("message", msg => {
     var curr_msg = msg.content;
     // print msg info
     console.log("message: " + msg.content); // message string
-    console.log("words: " + msg.content.split(" ")); // array of words split by space " "
+    console.log("words: " + msg.content.split(/\s/)); // array of words split by whitespace
     console.log("author: " + msg.author); // msg.author and msg.author.id return same number string (id)
     console.log("msg ID: " + msg.id); // msg id
     console.log("Timestamp: " + msg.createdTimestamp); // time (milliseconds) since discord epoch (?)
@@ -94,15 +106,3 @@ client.on("message", msg => {
 })
 // console.log(process.env.TOKEN);
 client.login(process.env.TOKEN);
-
-// MongoDB client connection reference (replace <password> with LogLogs password):
-/*
-const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://LogLogs:<password>@msgcluster.8dtqt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
- */
