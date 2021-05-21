@@ -79,8 +79,8 @@ client.on("message", msg => {
       }
     }
     // omegalul
-    if (curr_msg.toLowerCase() == "bruh") {
-      msg.channel.send("bruh moment");
+    if (curr_msg.replace(/\s+/g, '').toLowerCase() == "bruh") {
+      msg.channel.send(curr_msg + " moment");
     }
     if (curr_msg.toLowerCase() == "ping") {
       // check server lag?
