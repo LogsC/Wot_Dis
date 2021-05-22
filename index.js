@@ -23,17 +23,27 @@ client.on("ready", () => {
   console.log("Messages: \n");
   // obtain list of all channels that the bot (client) has access to
   var channels = client.channels.cache.array();
-  // confirm first channel is a text channel
-  if (channels[0].isText()) {
-    // pull the 100 most recent messages from first channel in list
-    console.log("Channels: " + channels.length);
-    channels[0].messages.fetch({ limit: 100 }).then(messages => {
-      console.log(`Received ${messages.size} messages`);
-      //Iterate through the messages here with the variable "messages".
-      messages.forEach(message => console.log(message.content))
-    })
-    // https://stackoverflow.com/questions/55153125/fetch-more-than-100-messages to continue finding messages
-  }
+  console.log("Channels: " + channels.length);
+  var textchannels = 0;
+  var nummessages = 0;
+  channels.forEach(channel => {
+    // confirm channel is a text channel
+    if (channel.isText()) {
+      textchannels += 1;
+      // pull the 100 most recent messages from first channel in list
+      channel.messages.fetch({ limit: 100 }).then(messages => {
+        console.log(`Received ${messages.size} messages`);
+        nummessages += messages.size;
+        //Iterate through the messages here with the variable "messages".
+        messages.forEach(message => console.log(message.content))
+        // basic messsage data
+        console.log("Text channels: " + textchannels);
+        console.log("Message amount: " + nummessages);
+      })
+      // https://stackoverflow.com/questions/55153125/fetch-more-than-100-messages to continue finding messages
+    }
+  })
+
   // TODO: connect to MDB client and load data
   // extract data from discord
   /*
