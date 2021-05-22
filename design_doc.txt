@@ -1,0 +1,15 @@
+Pseudocode:
+
+import / setup dotenv, discord.js, mongodb
+
+connect to discord client (when discord client is ready):
+    connect to MDB client
+    for text channel in client.channels:
+        for message in channel.messages:
+            for word in message:
+                input word / relevant info into MDB
+    exit MDB client
+
+when discord client recieves message:
+    process message
+        *** if relevant, connect to MDB return dataset, exit MDB

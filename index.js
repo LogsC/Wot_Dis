@@ -25,14 +25,18 @@ client.on("ready", () => {
   var channels = client.channels.cache.array();
   // confirm first channel is a text channel
   if (channels[0].isText()) {
-    var messages = channels[0].messages.cache.array();
+    // pull the 100 most recent messages from first channel in list
+    console.log("Channels: " + channels.length);
+    channels[0].messages.fetch({ limit: 100 }).then(messages => {
+      console.log(`Received ${messages.size} messages`);
+      //Iterate through the messages here with the variable "messages".
+      messages.forEach(message => console.log(message.content))
+    })
+    // https://stackoverflow.com/questions/55153125/fetch-more-than-100-messages to continue finding messages
   }
   // TODO: connect to MDB client and load data
   // extract data from discord
-  // MongoDB client connection reference (replace <password> with LogLogs password):
   /*
-  const MongoClient = require('mongodb').MongoClient;
-  const uri = "mongodb+srv://LogLogs:<password>@msgcluster.8dtqt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
   const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   client.connect(err => {
     const collection = client.db("test").collection("devices");
@@ -40,14 +44,6 @@ client.on("ready", () => {
     client.close();
   });
   */
-  // pull the 100 most recent messages from first channel in list
-  console.log("Channels: " + channels.length);
-  channels[0].messages.fetch({ limit: 100 }).then(messages => {
-    console.log(`Received ${messages.size} messages`);
-    //Iterate through the messages here with the variable "messages".
-    messages.forEach(message => console.log(message.content))
-  })
-  // https://stackoverflow.com/questions/55153125/fetch-more-than-100-messages to continue finding messages
 })
 
 // set prefix
