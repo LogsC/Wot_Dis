@@ -72,6 +72,8 @@ clientMDB.connect(err => {
           })
           console.log("Text channels: " + textchannels);
           console.log("Message amount: " + nummessages);
+        }).catch(err => {
+          console.log(err);
         })
         // pull the 100 most recent messages from first channel in list
         /*
@@ -154,11 +156,14 @@ clientMDB.connect(err => {
             if (!args[0]) {
               msg.channel.send("Current word commands include: \n" +
                 "~word amt <word>\n" +
+                "~word amt <word> <user>\n" +
                 "~word amt <word> server");
             } else {
               // can expand later
               if (args[0] == "amt") {
                 var word = args[1].toLowerCase();
+                // console.log("Argument 2: " + args[2]);
+                // console.log("User substring: " + args[2].substring(3, args[2].length - 1));
                 if (args[2] == "server") {
                   // query is only limited to this server
                   var query = { "Word": word, "GuildID": msg.guild.id };
@@ -167,6 +172,20 @@ clientMDB.connect(err => {
                     var count = result.length;
                     msg.channel.send("The amount of times " + word +
                       " has been said in this server is: " + count);
+                  })
+                } else if (args[2].substring(0, 3) == "<@!") {
+                  // if user ID is found
+                  var userID = args[2].substring(3, args[2].length - 1);
+                  // console.log("User ID: " + userID);
+                  var query = { "Word": word, "UserID": userID, "GuildID": msg.guild.id };
+                  col.find(query).toArray(function(err, result) {
+                    if (err) throw err;
+                    var count = result.length;
+                    msg.guild.members.fetch(userID).then(user => {
+                      msg.channel.send("The amount of times " + word +
+                        " has been said by " + user.nickname +
+                        " in this server is: " + count);
+                    })
                   })
                 } else if (word) {
                   var query = { "Word": word, "UserID": msg.author.id, "GuildID": msg.guild.id };
