@@ -119,7 +119,7 @@ clientMDB.connect(err => {
     if (!msg.author.bot) {
       var curr_msg = msg.content;
       // print msg info
-      /*
+    
       console.log("message: " + msg.content); // message string
       console.log("words: " + msg.content.split(/\s/)); // array of words split by whitespace
       console.log("author: " + msg.author); // msg.author and msg.author.id return same number string (id)
@@ -128,7 +128,7 @@ clientMDB.connect(err => {
       console.log("Time: " + msg.createdAt); // time in legible form
       console.log("Channel: " + msg.channel.id); // channel id
       console.log("Guild: " + msg.guild.id); // guild (server) id
-       */
+      
       // if first char of message = "~"
       if (curr_msg.substring(0, 1) == prefix) {
         // split message String into array separated by whitespace
@@ -142,7 +142,8 @@ clientMDB.connect(err => {
           case "help":
             msg.channel.send("Here are my commands!\n" +
               "~wotlabs <username>\n" +
-              "~word <command / query>");
+              "~word <command / query>\n" +
+              "~words <command / query>");
             break;
           case "wotlabs":
             msg.channel.send("https://wotlabs.net/na/player/" + args[0]);
@@ -175,6 +176,32 @@ clientMDB.connect(err => {
                     msg.channel.send("The amount of times " + word +
                     " has been said by " + msg.author.username +
                     " in this server is: " + count);
+                  })
+                }
+              }
+            }
+            break;
+          case "words":
+            if (!args[0]) {
+              msg.channel.send("Current words commands include:\n" +
+                "~words amt\n" +
+                "~words amt server");
+            } else {
+              if (args[0] == "amt") {
+                if (args[1] == "server") {
+                  var query = { "GuildID": msg.guild.id };
+                  col.find(query).toArray(function(err, result) {
+                    if (err) throw err;
+                    var count = result.length;
+                    msg.channel.send("The total words tracked in this server is: " + count);
+                  })
+                } else if (!args[1]) {
+                  var query = { "UserID": msg.author.id, "GuildID": msg.guild.id };
+                  col.find(query).toArray(function(err, result) {
+                    if (err) throw err;
+                    var count = result.length;
+                    msg.channel.send("The total words tracked in this server from " + msg.author.username +
+                    " is: " + count);
                   })
                 }
               }
