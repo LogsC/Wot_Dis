@@ -13,6 +13,7 @@ const uri = "mongodb+srv://LogLogs:" + process.env.MDB_PWD + "@msgcluster.8dtqt.
 // TODO: connect to MDB client and load data
 const clientMDB = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 clientMDB.connect(err => {
+  if (err) throw err;
   const col = clientMDB.db("discmsgs").collection("messageData");
   console.log("Connected to MDB client!");
   console.log("Collection: " + col);
@@ -113,15 +114,38 @@ clientMDB.connect(err => {
   // set prefix
   var prefix = "~";
 
-
-
   // wait for message
   client.on("message", msg => {
     // ignore all bot messages
     if (!msg.author.bot) {
       var curr_msg = msg.content;
+      console.log("message: " + curr_msg);
+      // input data
+      var query = {"MessageID": msg.id};
+      col.findOne(query, function(err, result) {
+        if (err) throw err;
+        // if there exists a result with given message ID, go next
+        if (!result) {
+          // split message into individual words
+          var words = msg.content.split(/\s/);
+          words.forEach(word => {
+            // remove trivial words
+            if (word != '') {
+              // create and insert messageData
+              let wordData = {
+                "Word": word.toLowerCase(),
+                "Date": msg.createdTimestamp,
+                "MessageID": msg.id,
+                "UserID": msg.author.id,
+                "GuildID": msg.guild.id
+              }
+              col.insertOne(wordData);
+            }
+          })
+        }
+      })
       // print msg info
-    
+      /*
       console.log("message: " + msg.content); // message string
       console.log("words: " + msg.content.split(/\s/)); // array of words split by whitespace
       console.log("author: " + msg.author); // msg.author and msg.author.id return same number string (id)
@@ -130,6 +154,7 @@ clientMDB.connect(err => {
       console.log("Time: " + msg.createdAt); // time in legible form
       console.log("Channel: " + msg.channel.id); // channel id
       console.log("Guild: " + msg.guild.id); // guild (server) id
+       */
       
       // if first char of message = "~"
       if (curr_msg.substring(0, 1) == prefix) {
@@ -157,14 +182,24 @@ clientMDB.connect(err => {
               msg.channel.send("Current word commands include: \n" +
                 "~word amt <word>\n" +
                 "~word amt <word> <user>\n" +
-                "~word amt <word> server");
+                "~word amt <word> server\n" +
+                "~word amt <word> leaderboards");
             } else {
               // can expand later
               if (args[0] == "amt") {
                 var word = args[1].toLowerCase();
                 // console.log("Argument 2: " + args[2]);
                 // console.log("User substring: " + args[2].substring(3, args[2].length - 1));
-                if (args[2] == "server") {
+                if (word && !args[2]) {
+                  var query = { "Word": word, "UserID": msg.author.id, "GuildID": msg.guild.id };
+                  col.find(query).toArray(function(err, result) {
+                    if (err) throw err;
+                    var count = result.length;
+                    msg.channel.send("The amount of times " + word +
+                    " has been said by " + msg.author.username +
+                    " in this server is: " + count);
+                  })
+                } else if (word && args[2] == "server") {
                   // query is only limited to this server
                   var query = { "Word": word, "GuildID": msg.guild.id };
                   col.find(query).toArray(function(err, result) {
@@ -173,7 +208,7 @@ clientMDB.connect(err => {
                     msg.channel.send("The amount of times " + word +
                       " has been said in this server is: " + count);
                   })
-                } else if (args[2].substring(0, 3) == "<@!") {
+                } else if (word && args[2].substring(0, 3) == "<@!") {
                   // if user ID is found
                   var userID = args[2].substring(3, args[2].length - 1);
                   // console.log("User ID: " + userID);
@@ -187,15 +222,20 @@ clientMDB.connect(err => {
                         " in this server is: " + count);
                     })
                   })
-                } else if (word) {
-                  var query = { "Word": word, "UserID": msg.author.id, "GuildID": msg.guild.id };
-                  col.find(query).toArray(function(err, result) {
+                } else if (word && args[2] == "leaderboards") {
+                  // access list of given word
+                  var query = { "Word": word, "GuildID": msg.guild.id };
+
+                  // return list of users and index?
+
+                  // find() cursor with find, then
+                  // sort() by UserID, then
+                  // toArray()
+                  col.find(query).sort( { "UserID" : 1 } ).toArray(function(err, result) {
                     if (err) throw err;
-                    var count = result.length;
-                    msg.channel.send("The amount of times " + word +
-                    " has been said by " + msg.author.username +
-                    " in this server is: " + count);
+                    // result is list sorted by UserID
                   })
+                  // for each distinct UserID, find number of instances in given array
                 }
               }
             }
@@ -204,23 +244,39 @@ clientMDB.connect(err => {
             if (!args[0]) {
               msg.channel.send("Current words commands include:\n" +
                 "~words amt\n" +
+                "~words amt <user>\n" +
                 "~words amt server");
             } else {
               if (args[0] == "amt") {
-                if (args[1] == "server") {
+                if (!args[1]) {
+                  var query = { "UserID": msg.author.id, "GuildID": msg.guild.id };
+                  col.find(query).toArray(function(err, result) {
+                    if (err) throw err;
+                    var count = result.length;
+                    msg.channel.send("The total words tracked in this server from " + 
+                      msg.author.username +
+                      " is: " + count);
+                  })
+                } else if (args[1] == "server") {
                   var query = { "GuildID": msg.guild.id };
                   col.find(query).toArray(function(err, result) {
                     if (err) throw err;
                     var count = result.length;
                     msg.channel.send("The total words tracked in this server is: " + count);
                   })
-                } else if (!args[1]) {
-                  var query = { "UserID": msg.author.id, "GuildID": msg.guild.id };
+                } else if (args[1].substring(0, 3) == "<@!") {
+                  // if user ID is found
+                  var userID = args[1].substring(3, args[1].length - 1);
+                  // console.log("User ID: " + userID);
+                  var query = { "UserID": userID, "GuildID": msg.guild.id };
                   col.find(query).toArray(function(err, result) {
                     if (err) throw err;
                     var count = result.length;
-                    msg.channel.send("The total words tracked in this server from " + msg.author.username +
-                    " is: " + count);
+                    msg.guild.members.fetch(userID).then(user => {
+                      msg.channel.send("The total words tracked in this server said by " +
+                        user.nickname +
+                        " in this server is: " + count);
+                    })
                   })
                 }
               }
@@ -233,6 +289,10 @@ clientMDB.connect(err => {
       // omegalul
       if (curr_msg.replace(/\s+/g, '').toLowerCase() == "bruh") {
         msg.channel.send(curr_msg + " moment");
+      }
+      // mc gang
+      if (curr_msg.replace(/\s+/g, '').toLowerCase() == "mcgang") {
+        msg.channel.send("mc gang");
       }
       if (curr_msg.toLowerCase() == "ping") {
         // check server lag?
