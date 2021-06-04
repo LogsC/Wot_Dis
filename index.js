@@ -224,18 +224,46 @@ clientMDB.connect(err => {
                   })
                 } else if (word && args[2] == "leaderboards") {
                   // access list of given word
-                  var query = { "Word": word, "GuildID": msg.guild.id };
+                  var query = { "Word": word , "GuildID": msg.guild.id };
 
                   // return list of users and index?
+                  
+                  // var word_counts = []; // hold user wordcounts
+                  var output_string = "Here is the list for '" + word + "' word count:\n";
+                  msg.channel.send(output_string);
 
-                  // find() cursor with find, then
-                  // sort() by UserID, then
-                  // toArray()
-                  col.find(query).sort( { "UserID" : 1 } ).toArray(function(err, result) {
-                    if (err) throw err;
-                    // result is list sorted by UserID
+                  col.distinct( "UserID" , query ).then(listIDs => {
+                    console.log(listIDs);
+                    // var promise = new Promise((resolve, reject) => {
+                      // wait for entire forEach to complete
+                    listIDs.forEach(uniqueID => {
+                      // console.log(uniqueID);
+                      query_user = { "Word": word , "UserID": uniqueID, "GuildID": msg.guild.id };
+                      col.find(query_user).toArray(function(err, result) {
+                        // console.log(result.length);
+                        if (err) throw err;
+                        // word_counts.push(result.length);
+                        msg.guild.members.fetch(uniqueID).then(user => {
+                          msg.channel.send(user.nickname + ": " +
+                            result.length + "\n");
+                          // output_string = output_string + 
+                          //   user.nickname + ": " +
+                          //   result.length + "\n";
+                          // console.log("inner inner: " + output_string)
+                        })
+                        // console.log("inner: " + output_string);
+                      })
+                      // console.log(output_string);
+                    })
+                    // })
+                    /*
+                    promise.then(() => {
+                      console.log("Promise: " + output_string);
+                      msg.channel.send(output_string);
+                    })
+                    */
+                    // msg.channel.send(output_string);
                   })
-                  // for each distinct UserID, find number of instances in given array
                 }
               }
             }
