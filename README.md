@@ -1,7 +1,7 @@
 # Wot_Dis
 
 This is a program designed to perform data analytics and more (TBD).
-As for now, this program creates an interactive Discord bot which can read and respond to commands and certain phrases.
+As for now, this program runs an interactive Discord bot which can read and respond to commands and certain phrases.
 
 TODO: use https://stackedit.io/app# for README.md
 
