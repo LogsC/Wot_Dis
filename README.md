@@ -21,3 +21,4 @@ Discord Messages Data Analysis:
          - retrieve most recent 100 messages per channel
          - partition each message into individual words (separated by spaces)
          - input individual words with relevant data components into MongoDB Atlas database
+
