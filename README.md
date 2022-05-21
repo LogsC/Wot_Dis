@@ -18,7 +18,7 @@ Discord Messages Data Analysis:
     Data Extraction:
      - upon loading bot:
          - recursively parse through all channels accessible by the bot
-         - retrieve most recent 100 messages per channel
+         - retrieve most recent 100 messages per channel asynchronously
          - partition each message into individual words (separated by spaces)
          - input individual words with relevant data components into MongoDB Atlas database
 
